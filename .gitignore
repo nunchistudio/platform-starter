@@ -70,9 +70,6 @@ $RECYCLE.BIN/
 *.test
 *.out
 
-go.work
-go.work.sum
-
 releases/
 vendor/
 
