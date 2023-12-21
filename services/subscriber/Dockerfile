@@ -8,6 +8,6 @@ COPY *.go ./
 
 RUN go build -o /subscriber
 
-ENV OTEL_TRACES_ENDPOINT=host.docker.internal:7021
+ENV OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=host.docker.internal:7021
 
 CMD ["/subscriber"]

@@ -9,6 +9,6 @@ COPY *.go ./
 RUN go build -o /httpapi
 EXPOSE 8080
 
-ENV OTEL_TRACES_ENDPOINT=host.docker.internal:7021
+ENV OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=host.docker.internal:7021
 
 CMD ["/httpapi"]
