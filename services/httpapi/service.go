@@ -1,15 +1,13 @@
 package main
 
 import (
+	"context"
 	"net/http"
 
 	"go.nunchi.studio/helix/event"
-	natsinte "go.nunchi.studio/helix/integration/nats"
+	"go.nunchi.studio/helix/integration/nats"
 	"go.nunchi.studio/helix/integration/rest"
-	"go.nunchi.studio/helix/integration/rest/handlerfunc"
 	"go.nunchi.studio/helix/service"
-
-	"github.com/nats-io/nats.go"
 )
 
 /*
@@ -18,7 +16,7 @@ case, it holds a REST router and NATS JetStream context.
 */
 type App struct {
 	REST      rest.REST
-	JetStream natsinte.JetStream
+	JetStream nats.JetStream
 }
 
 /*
@@ -29,7 +27,7 @@ var app *App
 /*
 NewAndStart creates a new helix service and starts it.
 */
-func NewAndStart() error {
+func NewAndStart(ctx context.Context) error {
 
 	// First, create a new REST router. We keep empty config but feel free to
 	// dive more later for configuring OpenAPI behavior.
@@ -40,7 +38,7 @@ func NewAndStart() error {
 
 	// Then, create a new NATS JetStream context. We keep empty config but feel
 	// free to dive more later for advanced configuration.
-	js, err := natsinte.Connect(natsinte.Config{})
+	js, err := nats.Connect(nats.Config{})
 	if err != nil {
 		return err
 	}
@@ -84,12 +82,12 @@ func NewAndStart() error {
 
 		js.Publish(ctx, msg)
 
-		handlerfunc.Accepted(rw, req)
+		rest.WriteAccepted(rw, req)
 	})
 
 	// Start the service using the helix's service package. Only one helix service
 	// must be running per process. This is a blocking operation.
-	err = service.Start()
+	err = service.Start(ctx)
 	if err != nil {
 		return err
 	}
@@ -102,8 +100,8 @@ Close tries to gracefully close the helix service. This will automatically close
 all connections of each integration when applicable. You can add other logic as
 well here.
 */
-func (app *App) Close() error {
-	err := service.Close()
+func (app *App) Close(ctx context.Context) error {
+	err := service.Close(ctx)
 	if err != nil {
 		return err
 	}
